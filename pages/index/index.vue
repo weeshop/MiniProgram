@@ -384,7 +384,7 @@
 			},
 			search: function() {
 				uni.navigateTo({
-					url: '../news-search/news-search'
+					url: '../search/search'
 				})
 			}
 		},
