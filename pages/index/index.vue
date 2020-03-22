@@ -1,164 +1,169 @@
 <template>
-	<view class="container">
-		<!--tabbar-->
-		<view class="tui-tabbar">
-			<block v-for="(item,index) in tabbar" :key="index">
-				<view class="tui-tabbar-item" :class="[current==index?'tui-item-active':'']" :data-index="index" @tap="tabbarSwitch">
-					<view :class="[index==0?'tui-ptop-4':'']">
-						<tui-icon :name="current==index?item.icon+'-fill':item.icon" :color="current==index?'#E41F19':'#666'" :size="item.size"></tui-icon>
+	<view>
+		<tui-skeleton v-if="skeletonShow" backgroundColor="#fafafa" borderRadius="10rpx"></tui-skeleton>
+		<view class="container tui-skeleton">
+			<!--tabbar-->
+			<view class="tui-tabbar">
+				<block v-for="(item,index) in tabbar" :key="index">
+					<view class="tui-tabbar-item" :class="[current==index?'tui-item-active':'']" :data-index="index" @tap="tabbarSwitch">
+						<view :class="[index==0?'tui-ptop-4':'']">
+							<tui-icon :name="current==index?item.icon+'-fill':item.icon" :color="current==index?'#E41F19':'#666'" :size="item.size"></tui-icon>
+						</view>
+						<view class="tui-scale">{{item.text}}</view>
 					</view>
-					<view class="tui-scale">{{item.text}}</view>
+				</block>
+			</view>
+			<!--tabbar-->
+			<!--header-->
+			<view class="tui-header">
+				<view class="tui-category tui-skeleton-rect" hover-class="opcity" :hover-stay-time="150" @tap="classify">
+					<tui-icon name="manage-fill" color="#fff" :size="22"></tui-icon>
+					<view class="tui-category-scale">分类</view>
 				</view>
-			</block>
-		</view>
-		<!--tabbar-->
-		<!--header-->
-		<view class="tui-header">
-			<view class="tui-category" hover-class="opcity" :hover-stay-time="150" @tap="classify">
-				<tui-icon name="manage-fill" color="#fff" :size="22"></tui-icon>
-				<view class="tui-category-scale">分类</view>
-			</view>
-			<view class="tui-rolling-search">
-				<!-- #ifdef APP-PLUS || MP -->
-				<icon type="search" :size='13' color='#999'></icon>
-				<!-- #endif -->
-				<!-- #ifdef H5 -->
-				<view>
-					<tui-icon name="search" :size='16' color='#999'></tui-icon>
-				</view>
-				<!-- #endif -->
-				<swiper vertical autoplay circular interval="8000" class="tui-swiper">
-					<swiper-item v-for="(item,index) in hotSearch" :key="index" class="tui-swiper-item" @tap="search">
-						<view class="tui-hot-item">{{item}}</view>
-					</swiper-item>
-				</swiper>
-			</view>
-		</view>
-		<!--header-->
-		<view class="tui-header-banner">
-			<view class="tui-hot-search">
-				<view>热搜</view>
-				<view class="tui-hot-tag" @tap="search">自热火锅</view>
-				<view class="tui-hot-tag" @tap="search">华为手机</view>
-				<view class="tui-hot-tag" @tap="search">有机酸奶</view>
-				<view class="tui-hot-tag" @tap="search">苹果手机</view>
-			</view>
-			<view class="tui-banner-bg">
-				<view class="tui-primary-bg tui-route-left"></view>
-				<view class="tui-primary-bg tui-route-right"></view>
-				<!--banner-->
-				<view class="tui-banner-box">
-					<swiper :indicator-dots="true" :autoplay="true" :interval="5000" :duration="150" class="tui-banner-swiper"
-					 :circular="true" indicator-color="rgba(255, 255, 255, 0.8)" indicator-active-color="#fff">
-						<swiper-item v-for="(item,index) in banner" :key="index" @tap.stop="detail">
-							<image :src="'/static/images/mall/banner/'+item" class="tui-slide-image" mode="scaleToFill" />
+				<view class="tui-rolling-search tui-skeleton-rect">
+					<!-- #ifdef APP-PLUS || MP -->
+					<icon type="search" :size='13' color='#999'></icon>
+					<!-- #endif -->
+					<!-- #ifdef H5 -->
+					<view>
+						<tui-icon name="search" :size='16' color='#999'></tui-icon>
+					</view>
+					<!-- #endif -->
+					<swiper vertical autoplay circular interval="8000" class="tui-swiper">
+						<swiper-item v-for="(item,index) in hotSearch" :key="index" class="tui-swiper-item" @tap="search">
+							<view class="tui-hot-item">{{item}}</view>
 						</swiper-item>
 					</swiper>
 				</view>
 			</view>
-		</view>
-
-		<view class="tui-product-category">
-			<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name" @tap="more">
-				<image :src="'/static/images/mall/category/'+item.img" class="tui-category-img" mode="scaleToFill"></image>
-				<view class="tui-category-name">{{item.name}}</view>
-			</view>
-		</view>
-
-		<view class="tui-product-box tui-pb-20 tui-bg-white">
-			<view class="tui-group-name" @tap="more">
-				<text>新人专享</text>
-				<tui-icon name="arrowright" :size="20" color="#555"></tui-icon>
-			</view>
-			<view class="tui-activity-box" @tap="detail">
-				<image src="/static/images/mall/activity/activity_1.jpg" class="tui-activity-img" mode="widthFix"></image>
-				<image src="/static/images/mall/activity/activity_2.jpg" class="tui-activity-img" mode="widthFix"></image>
-			</view>
-		</view>
-
-		<view class="tui-product-box tui-pb-20 tui-bg-white">
-			<view class="tui-group-name" @tap="more">
-				<text>新品推荐</text>
-				<tui-icon name="arrowright" :size="20" color="#555"></tui-icon>
-			</view>
-			<view class="tui-new-box">
-				<view class="tui-new-item" :class="[index!=0 && index!=1 ?'tui-new-mtop':'']" v-for="(item,index) in newProduct"
-				 :key="index" @tap="detail">
-					<image :src="'/static/images/mall/new/'+(item.type==1?'new':'discount')+'.png'" class="tui-new-label" v-if="item.isLabel"></image>
-					<view class="tui-title-box">
-						<view class="tui-new-title">{{item.name}}</view>
-						<view class="tui-new-price">
-							<text class="tui-new-present">￥{{item.present}}</text>
-							<text class="tui-new-original">￥{{item.original}}</text>
-						</view>
+			<!--header-->
+			<view class="tui-header-banner">
+				<view class="tui-hot-search">
+					<view class="tui-skeleton-rect">热搜</view>
+					<view class="tui-hot-tag tui-skeleton-rect" @tap="search">自热火锅</view>
+					<view class="tui-hot-tag tui-skeleton-rect" @tap="search">华为手机</view>
+					<view class="tui-hot-tag tui-skeleton-rect" @tap="search">有机酸奶</view>
+					<view class="tui-hot-tag tui-skeleton-rect" @tap="search">苹果手机</view>
+				</view>
+				<view class="tui-banner-bg">
+					<view class="tui-primary-bg tui-route-left"></view>
+					<view class="tui-primary-bg tui-route-right"></view>
+					<!--banner-->
+					<view class="tui-banner-box tui-skeleton-rect">
+						<swiper :indicator-dots="true" :autoplay="true" :interval="5000" :duration="150" class="tui-banner-swiper"
+						 :circular="true" indicator-color="rgba(255, 255, 255, 0.8)" indicator-active-color="#fff">
+							<swiper-item v-for="(item,index) in banner" :key="index" @tap.stop="detail">
+								<image :src="'/static/images/mall/banner/'+item" class="tui-slide-image" mode="scaleToFill" />
+							</swiper-item>
+						</swiper>
 					</view>
-					<image :src="'/static/images/mall/new/'+item.pic" class="tui-new-img"></image>
 				</view>
 			</view>
-		</view>
 
-		<view class="tui-product-box">
-			<view class="tui-group-name">
-				<text>热门推荐</text>
+			<view class="tui-product-category">
+				<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name" @tap="more">
+					<image :src="'/static/images/mall/category/'+item.img" class="tui-category-img tui-skeleton-rect" mode="scaleToFill"></image>
+					<view class="tui-category-name">{{item.name}}</view>
+				</view>
 			</view>
-			<view class="tui-product-list">
-				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2!=0">
-						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'/static/images/mall/product/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
-							<view class="tui-pro-content">
-								<view class="tui-pro-tit">{{item.name}}</view>
-								<view>
-									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
-									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
-								</view>
+
+			<view class="tui-product-box tui-pb-20 tui-bg-white">
+				<view class="tui-group-name" @tap="more">
+					<text class="tui-skeleton-rect">新人专享</text>
+					<tui-icon name="arrowright" :size="20" color="#555"></tui-icon>
+				</view>
+				<view class="tui-activity-box tui-skeleton-rect" @tap="detail">
+					<image src="/static/images/mall/activity/activity_1.jpg" class="tui-activity-img" mode="widthFix"></image>
+					<image src="/static/images/mall/activity/activity_2.jpg" class="tui-activity-img" mode="widthFix"></image>
+				</view>
+			</view>
+
+			<view class="tui-product-box tui-pb-20 tui-bg-white">
+				<view class="tui-group-name tui-skeleton-rect" @tap="more">
+					<text class="tui-skeleton-rect">新品推荐</text>
+					<tui-icon name="arrowright" :size="20" color="#555"></tui-icon>
+				</view>
+				<view class="tui-new-box">
+					<view class="tui-new-item" :class="[index!=0 && index!=1 ?'tui-new-mtop':'']" v-for="(item,index) in newProduct"
+					 :key="index" @tap="detail">
+						<image :src="'/static/images/mall/new/'+(item.type==1?'new':'discount')+'.png'" class="tui-new-label" v-if="item.isLabel"></image>
+						<view class="tui-title-box">
+							<view class="tui-new-title tui-skeleton-rect">{{item.name}}</view>
+							<view class="tui-new-price">
+								<text class="tui-new-present tui-skeleton-rect">￥{{item.present}}</text>
+								<text class="tui-new-original tui-skeleton-rect">￥{{item.original}}</text>
 							</view>
 						</view>
-						<!--商品列表-->
-						<!-- <template is="productItem" data="{{item,index:index}}" /> -->
-					</block>
-				</view>
-				<view class="tui-product-container">
-					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2==0">
-						<!--商品列表-->
-						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
-							<image :src="'/static/images/mall/product/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
-							<view class="tui-pro-content">
-								<view class="tui-pro-tit">{{item.name}}</view>
-								<view>
-									<view class="tui-pro-price">
-										<text class="tui-sale-price">￥{{item.sale}}</text>
-										<text class="tui-factory-price">￥{{item.factory}}</text>
-									</view>
-									<view class="tui-pro-pay">{{item.payNum}}人付款</view>
-								</view>
-							</view>
-						</view>
-						<!--商品列表-->
-						<!-- <template is="productItem" data="{{item,index:index}}" /> -->
-					</block>
+						<image :src="'/static/images/mall/new/'+item.pic" class="tui-new-img tui-skeleton-rect"></image>
+					</view>
 				</view>
 			</view>
-		</view>
 
-		<!--加载loadding-->
-		<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
-		<!-- <tui-nomore visible="{{!pullUpOn}}"></tui-nomore> -->
-		<!--加载loadding-->
-		<view class="tui-safearea-bottom"></view>
+			<view class="tui-product-box">
+				<view class="tui-group-name">
+					<text>热门推荐</text>
+				</view>
+				<view class="tui-product-list">
+					<view class="tui-product-container">
+						<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2!=0">
+							<!--商品列表-->
+							<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
+								<image :src="'/static/images/mall/product/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+								<view class="tui-pro-content">
+									<view class="tui-pro-tit">{{item.name}}</view>
+									<view>
+										<view class="tui-pro-price">
+											<text class="tui-sale-price">￥{{item.sale}}</text>
+											<text class="tui-factory-price">￥{{item.factory}}</text>
+										</view>
+										<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									</view>
+								</view>
+							</view>
+							<!--商品列表-->
+							<!-- <template is="productItem" data="{{item,index:index}}" /> -->
+						</block>
+					</view>
+					<view class="tui-product-container">
+						<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2==0">
+							<!--商品列表-->
+							<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail">
+								<image :src="'/static/images/mall/product/'+item.img+'.jpg'" class="tui-pro-img" mode="widthFix" />
+								<view class="tui-pro-content">
+									<view class="tui-pro-tit">{{item.name}}</view>
+									<view>
+										<view class="tui-pro-price">
+											<text class="tui-sale-price">￥{{item.sale}}</text>
+											<text class="tui-factory-price">￥{{item.factory}}</text>
+										</view>
+										<view class="tui-pro-pay">{{item.payNum}}人付款</view>
+									</view>
+								</view>
+							</view>
+							<!--商品列表-->
+							<!-- <template is="productItem" data="{{item,index:index}}" /> -->
+						</block>
+					</view>
+				</view>
+			</view>
+
+			<!--加载loadding-->
+			<tui-loadmore :visible="loadding" :index="3" type="red"></tui-loadmore>
+			<!-- <tui-nomore visible="{{!pullUpOn}}"></tui-nomore> -->
+			<!--加载loadding-->
+			<view class="tui-safearea-bottom"></view>
+		</view>
 	</view>
 </template>
 <script>
+	import tuiSkeleton from "@/components/tui-skeleton/tui-skeleton"
 	import tuiIcon from "@/components/icon/icon"
 	import tuiTag from "@/components/tag/tag"
 	import tuiLoadmore from "@/components/loadmore/loadmore"
 	import tuiNomore from "@/components/nomore/nomore"
 	export default {
 		components: {
+			tuiSkeleton,
 			tuiIcon,
 			tuiTag,
 			tuiLoadmore,
@@ -166,6 +171,7 @@
 		},
 		data() {
 			return {
+				skeletonShow: true,
 				current: 0,
 				tabbar: [{
 					icon: "home",
@@ -345,6 +351,11 @@
 				loadding: false,
 				pullUpOn: true
 			}
+		},
+		onLoad() {
+			setTimeout(() => {
+				this.skeletonShow = false
+			}, 1800);
 		},
 		methods: {
 			tabbarSwitch: function(e) {
