@@ -94,7 +94,7 @@
 								<text class="tui-new-original tui-skeleton-rect">￥{{item.original}}</text>
 							</view>
 						</view>
-						<image :src="'/static/images/mall/new/'+item.pic" class="tui-new-img tui-skeleton-rect"></image>
+						<image :src="'/static/images/mall/new/'+item.pic" class="tui-new-img tui-skeleton-fillet"></image>
 					</view>
 				</view>
 			</view>

@@ -4,7 +4,7 @@
 		<view class="container tui-skeleton">
 			<!--header-->
 			<view class="tui-header-box" :style="{height:height+'px',background:'rgba(255,255,255,'+opcity+')'}">
-				<view class="tui-header tui-skeleton-rect" :style="{paddingTop:top+'px', opacity:opcity}">
+				<view class="tui-header" :style="{paddingTop:top+'px', opacity:opcity}">
 					我的
 				</view>
 				<!-- #ifndef MP -->
@@ -21,13 +21,13 @@
 			</view>
 			<!--header-->
 			<view class="tui-mybg-box">
-				<image src="/static/images/mall/my/img_bg_3x.png" class="tui-my-bg tui-skeleton-rect" mode="widthFix"></image>
+				<image src="/static/images/mall/my/img_bg_3x.png" class="tui-my-bg" mode="widthFix"></image>
 				<view class="tui-header-center">
-					<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-avatar" @tap="href(3)"></image>
+					<image src="/static/images/my/mine_def_touxiang_3x.png" class="tui-avatar tui-skeleton-circular" @tap="href(3)"></image>
 					<view class="tui-info">
-						<view class="tui-nickname">echo. <image src="/static/images/mall/my/icon_vip_3x.png" class="tui-img-vip"></image>
+						<view class="tui-nickname tui-skeleton-rect">echo. <image src="/static/images/mall/my/icon_vip_3x.png" class="tui-img-vip"></image>
 						</view>
-						<view class="tui-explain">这家伙很懒…</view>
+						<view class="tui-explain tui-skeleton-rect">这家伙很懒…</view>
 					</view>
 					<!-- #ifndef MP -->
 					<view class="tui-btn-edit">
