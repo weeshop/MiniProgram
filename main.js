@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import App from './App'
+import RequestUniApp from 'utils/weeshop_lib/UniApp/RequestUniApp.js'
+import APIManager from 'utils/weeshop_lib/APIManager.js'
+import SessionManagerOauth2UniApp from 'utils/weeshop_lib/UniApp/SessionManagerOauth2UniApp.js'
+let Oauth2 = require('./utils/weeshop_lib/api/oauth2.js')
 
 Vue.config.productionTip = false
 
@@ -100,6 +104,53 @@ const tui = {
 		return "https://www.thorui.cn/wx"
 	}
 }
+
+let request = new RequestUniApp(
+	(res) => {
+		console.log('请求成功！')
+		return new Promise((resolve, reject) => {
+			resolve(res)
+		})
+	},
+	(err) => {
+		console.log('请求失败！')
+	})
+
+// 初始化 APIManager
+let apiManager = new APIManager(request,
+	(err) => {
+		console.log('重试失败！')
+	}
+)
+
+// 让 APIManager 支持会话
+let sessionManager = new SessionManagerOauth2UniApp(
+  apiManager,
+	() => {
+		console.log('引导登录！')
+		return new Promise((resolve, reject) => {
+			// 登录凭证可以通过弹窗让用户输入
+			
+			// 用户名、邮箱或手机号 + 密码登录
+			const username = '164713332@qq.com'
+			const password = '123'
+			// resolve(new Oauth2.CreateTokenByPasswordImproved(username, password))
+			
+			// 手机短信验证码登录
+			const country = 'CN'
+			const number = '15999643270'
+			const code = '666666'
+			resolve(new Oauth2.CreateTokenBySMS(country, number, code))
+		})
+	},
+	(session) => {
+		console.log('会话已创建！')
+		console.log(session)
+	},
+)
+
+Vue.prototype.APIManager = apiManager
+
 
 Vue.prototype.tui = tui
 Vue.prototype.$eventHub = Vue.prototype.$eventHub || new Vue()

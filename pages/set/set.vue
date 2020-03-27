@@ -42,7 +42,9 @@
 		</view>
 
 		<view class="tui-exit">
-			<tui-button type="danger" height="88rpx">退出登录</tui-button>
+			<navigator url="../login/login">
+				<tui-button type="danger" height="88rpx">退出登录</tui-button>
+			</navigator>
 		</view>
 	</view>
 </template>

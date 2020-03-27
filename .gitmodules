@@ -1,0 +1,3 @@
+[submodule "utils/weeshop_lib"]
+	path = utils/weeshop_lib
+	url = git@gitee.com:solody/ClientLib-For-JS.git
