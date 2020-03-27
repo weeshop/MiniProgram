@@ -114,6 +114,9 @@ let request = new RequestUniApp(
 	},
 	(err) => {
 		console.log('请求失败！')
+		return new Promise((resolve, reject) => {
+			resolve()
+		})
 	})
 
 // 初始化 APIManager
@@ -143,9 +146,11 @@ let sessionManager = new SessionManagerOauth2UniApp(
 			resolve(new Oauth2.CreateTokenBySMS(country, number, code))
 		})
 	},
-	(session) => {
+	() => {
 		console.log('会话已创建！')
-		console.log(session)
+		return new Promise((resolve, reject) => {
+			resolve()
+		})
 	},
 )
 
