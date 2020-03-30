@@ -5,7 +5,7 @@
 			<image src="../../static/images/my/mine_def_touxiang_3x.png" class="tui-photo"></image>
 			<view class="tui-login-name">新用户</view>
 		</view>
-		<form :report-submit="true" @submit="formLogin">
+		<form :report-submit="true" @submit="promiseLogin">
 			<view class="tui-login-from">
 				<view class="tui-line-cell">
 					<tui-icon name="mobile" :size="20" color='#5677fc'></tui-icon>
@@ -35,6 +35,8 @@
 	import tuiIcon from "@/components/icon/icon"
 	import tuiButton from "@/components/button/button"
 	const util = require('../../utils/util.js')
+	let Oauth2 = require('../../utils/weeshop_lib/api/oauth2.js')
+	
 	export default {
 		components: {
 			tuiIcon,
@@ -92,6 +94,22 @@
 				setTimeout(() => {
 					this.doLoop(60)
 				}, 500)
+			},
+			promiseLogin(e) {
+				console.log(this.loginPromiseResolve)
+				// 用户名、邮箱或手机号 + 密码登录
+				const username = '164713332@qq.com'
+				const password = '123'
+				let passwordLogin = new Oauth2.CreateTokenByPasswordImproved(username, password)
+				
+				// 手机短信验证码登录
+				const country = 'CN'
+				const number = '15999643270'
+				const code = '666666'
+				let smsLogin = new Oauth2.CreateTokenBySMS(country, number, code)
+				
+				this.loginPromiseResolve(smsLogin) // 使用手机短信验证码登录
+				uni.navigateBack()
 			},
 			formLogin: function(e) {
 				let loginCode = e.detail.value.smsCode;
