@@ -51,6 +51,8 @@
 				code: ""
 			}
 		},
+		onShow() {
+		},
 		methods: {
 			...mapMutations(['login']),
 			getRandom: function(u) {
