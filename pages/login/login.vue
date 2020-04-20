@@ -1,28 +1,30 @@
 <template>
-	<view class="container">
-		<view class="tui-bg-box">
-			<image src="../../static/images/login/bg_login.png" class="tui-bg-img"></image>
-			<image src="../../static/images/my/mine_def_touxiang_3x.png" class="tui-photo"></image>
-			<view class="tui-login-name">新用户</view>
+	<view class="page" >
+		<view class="top">
+			<image class="login-icon" src="/static/images/my/mine_def_touxiang_3x.png" mode=""></image>
+			<view class="login-bg"></view>
 		</view>
-		<form :report-submit="true" @submit="promiseLogin">
-			<view class="tui-login-from">
-				<view class="tui-line-cell">
-					<tui-icon name="mobile" :size="20" color='#5677fc'></tui-icon>
-					<input placeholder-class="phcolor" class="tui-input" name="mobile" placeholder="请输入手机号码" maxlength="11" v-model="mobile"
-					 type="number" />
+		<view class="body">
+			<form @submit="promiseLogin" >
+				<view class="info" v-for="(item, index) in login_list" :key="item.key">
+					<image class="info-icon" :src="item.icon" mode=""></image>
+					<input class="input-text" :name="item.key" :data-key="item.key" :focus="item.focus" :type="item.type" :placeholder="item.title" />
 				</view>
-				<view class="tui-line-cell tui-top28">
-					<tui-icon name="pwd" :size="20" color='#5677fc'></tui-icon>
-					<input placeholder-class="phcolor" class="tui-input" name="smsCode" placeholder="请输入验证码" maxlength="6" />
-					<tui-button size="mini" :type="type" shape="circle" :plain="true" :disabled="disabled" @click="btnSend">{{btnText}}</tui-button>
+				<!-- 登录按钮 -->
+				<button class="login-btn" form-type="submit">登录</button>
+				<view class="psw-tip">忘记密码?</view>
+
+				<!-- 切换 -->
+				<view class="buttom-tip">
+					<view class="text">
+						没有帐号?
+					</view>
+					<view class="tip-high" @tap="tapToRegister">
+						注册
+					</view>
 				</view>
-				<button class="btn-primary tui-btn-submit" hover-class="btn-hover" form-type="submit">登录</button>
-				<view class="tui-protocol" hover-class="opcity" :hover-stay-time="150">点击"登录"即表示已同意
-					<text class="tui-protocol-red" @tap="protocol">《用户协议》</text>
-				</view>
-			</view>
-		</form>
+			</form>
+		</view>
 	</view>
 </template>
 
@@ -44,218 +46,169 @@
 		},
 		data() {
 			return {
-				disabled: false,
-				btnText: "获取验证码",
-				mobile: "",
-				type: "primary",
-				code: ""
+				//静态输入框数据
+				login_list: [
+					{ key: 'account', title: '请输入帐号', icon: '/static/images/login/email.png', focus: true, type: 'text' ,show_right: false,},
+					{ key: 'pasw', title: '请输入密码', icon: '/static/images/login/password.png', focus: false, type: 'text' ,show_right: false,}
+				],
 			}
-		},
-		onShow() {
 		},
 		methods: {
 			...mapMutations(['login']),
-			getRandom: function(u) {
-				let rnd = "";
-				u = u || 6;
-				for (var i = 0; i < u; i++) {
-					rnd += Math.floor(Math.random() * 10);
-				}
-				return Number(rnd);
-			},
-			doLoop: function(seconds) {
-				let code = this.getRandom(6);
-				this.tui.toast('您本次的验证码是：' + code, 5000);
-				seconds = seconds ? seconds : 60;
-				this.btnText = seconds + "s后获取";
-				this.code = code
-				let countdown = setInterval(() => {
-					if (seconds > 0) {
-						this.btnText = seconds + "s后获取"
-							--seconds;
-					} else {
-						this.btnText = "获取验证码";
-						this.disabled = false;
-						this.type = "primary";
-						clearInterval(countdown);
-					}
-				}, 1000);
-			},
-			btnSend: function() {
-				if (util.isNullOrEmpty(this.mobile)) {
-					this.tui.toast('请输入手机号码');
-					return
-				} else if (!util.isMobile(this.mobile)) {
-					this.tui.toast('请输入正确的手机号码');
-					return
-				}
-				this.disabled = true;
-				this.btnText = "请稍候...";
-				this.type = "gray"
-
-				setTimeout(() => {
-					this.doLoop(60)
-				}, 500)
-			},
-			promiseLogin(e) {
-				console.log(this.loginPromiseResolve)
-				// 用户名、邮箱或手机号 + 密码登录
-				const username = '164713332@qq.com'
-				const password = '123'
-				let passwordLogin = new Oauth2.CreateTokenByPasswordImproved(username, password)
-				
-				// 手机短信验证码登录
-				const country = 'CN'
-				const number = '15999643270'
-				const code = '666666'
-				let smsLogin = new Oauth2.CreateTokenBySMS(country, number, code)
-				
-				this.loginPromiseResolve(smsLogin) // 使用手机短信验证码登录
-				uni.navigateBack()
-			},
-			formLogin: function(e) {
-				let loginCode = e.detail.value.smsCode;
-				let mobile = e.detail.value.mobile;
-				if (util.isNullOrEmpty(mobile)) {
-					this.tui.toast('请输入手机号码');
-					return
-				} else if (!util.isMobile(mobile)) {
-					util.toast('请输入正确的手机号码');
-					return
-				} else if (util.isNullOrEmpty(loginCode)) {
-					this.tui.toast('请输入验证码');
-					return
-				} else if (loginCode != this.code) {
-					this.tui.toast('验证码不正确');
-					return
-				}
-				uni.setStorageSync("thorui_mobile", util.formatNum(mobile));
-				let state = {
-					mobile: util.formatNum(mobile),
-					isLogin: true,
-					memberId: 0
-				};
-				this.login(state);
-				this.tui.toast("登录成功", 2000, true);
-				setTimeout(() => {
-					uni.reLaunch({
-						url: '../my/my'
-					})
-				}, 200);
-			},
-			protocol: function() {
+			//切换注册页面
+			tapToRegister() {
 				uni.navigateTo({
-					url: '../about/about'
+					url:"../register/register"
 				})
-			}
+			},
+			
+			//登录按钮
+			promiseLogin(e) {
+				var form_data = e.detail.value; //表单数据
+				// 用户名、邮箱或手机号 + 密码登录
+				let passwordLogin = new Oauth2.CreateTokenByPasswordImproved(form_data.account, form_data.pasw)
+				this.loginPromiseResolve(passwordLogin) // 使用手机短信验证码登录
+				
+				// // 手机短信验证码登录
+				// const country = 'CN'
+				// const number = '15999643270'
+				// const code = '666666'
+				// let smsLogin = new Oauth2.CreateTokenBySMS(country, number, code)
+				// this.loginPromiseResolve(smsLogin) // 使用手机短信验证码登录
+				// console.log(this.loginPromiseResolve);
+			},
+			
 		}
 	}
 </script>
 
 <style>
-	page {
-		background: #fff;
-	}
-
-	.tui-bg-box {
-		width: 100%;
-		box-sizing: border-box;
+	.page{
+		width: 750rpx;
+		height: 100%;
 		position: relative;
-		padding-top: 44rpx;
-	}
-
-	.tui-photo {
-		height: 138rpx;
-		width: 138rpx;
-		display: block;
-		margin: 10rpx auto 0 auto;
-		border-radius: 50%;
-		position: relative;
-		z-index: 2;
-	}
-
-	.tui-login-name {
-		width: 128rpx;
-		height: 40rpx;
-		font-size: 30rpx;
-		color: #fff;
-		margin: 36rpx auto 0 auto;
 		text-align: center;
-		position: relative;
-		z-index: 2;
 	}
-
-	.tui-bg-img {
+	
+	
+	
+	/* 顶部样式 */
+	.page .top{
+		height: 500rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.top .login-icon{
+		width: 150rpx;
+		height: 150rpx;
+		z-index: 1;
+		padding-bottom: 50rpx;
+	}
+	
+	.top .login-bg{
+		z-index: 0;
+		background-color: #ef315b;
+		/* background: linear-gradient(to bottom, #ef315b,#ef315b,#ef315b, #f27c72); */
 		width: 100%;
-		height: 346rpx;
-		display: block;
+		height: 500rpx;
+		border-bottom-left-radius: 160rpx;
 		position: absolute;
 		top: 0;
-	}
-
-	.tui-login-from {
-		width: 100%;
-		padding: 128rpx 104rpx 0 104rpx;
-		box-sizing: border-box;
-	}
-
-	.tui-input {
-		font-size: 32rpx;
-		flex: 1;
-		display: inline-block;
-		padding-left: 32rpx;
-		box-sizing: border-box;
-		overflow: hidden;
-	}
-
-	.tui-line-cell {
-		padding: 27rpx 0;
-		display: -webkit-flex;
-		display: flex;
-		-webkiit-align-items: center;
-		align-items: center;
-		position: relative;
-		box-sizing: border-box;
-		overflow: hidden;
-	}
-
-	.tui-line-cell::after {
-		content: '';
-		position: absolute;
-		border-bottom: 1rpx solid #e0e0e0;
-		-webkit-transform: scaleY(0.5);
-		transform: scaleY(0.5);
-		bottom: 0;
-		right: 0;
 		left: 0;
 	}
-
-	.tui-top28 {
-		margin-top: 28rpx;
-	}
-
-	.tui-btn-class {
-		width: 196rpx !important;
-		height: 54rpx !important;
-		border-radius: 27rpx !important;
-		font-size: 28rpx !important;
-		padding: 0 !important;
-		line-height: 54rpx !important;
-	}
-
-	.tui-btn-submit {
+	
+	/* body样式 */
+	.body{
 		margin-top: 100rpx;
+		width: 640rpx;
+		margin-left: auto;
+		margin-right: auto;
 	}
-
-	.tui-protocol {
-		color: #333;
-		font-size: 24rpx;
-		text-align: center;
+	
+	.body .info{
+		/* width: 100%; */
+		box-shadow: 0rpx 5rpx 12rpx #a9a9a9;
+		border-radius: 30rpx;
+		display: flex;
+		flex-direction: row;
+		height: 80rpx;
+		line-height: 80rpx;
+		padding: 0 10rpx;
+		align-items: center;
+		margin-bottom: 30rpx;
+	}
+	
+	.body .info :last-child{
+		margin-bottom: 0rpx;
+	}
+	
+	.info .info-icon{
+		width: 40rpx;
+		height: 40rpx;
+		margin: 0 30rpx;
+	}
+	
+	.info .input-text{
+		font-size: 30rpx;
+		text-align: start;
+		flex: 1;
+		margin-right: 30rpx;
+	}
+	
+	.info .code-btn{
+		height: 100%;
+		font-size: 18rpx;
+		margin-right: 10rpx;
+		font-weight: 400;
+	}
+	
+	.code-btn-color{
+		color: #a9a9a9;
+	}
+	
+	.body .psw-tip{
+		color: #a9a9a9;
+		font-size: 18rpx;
+		margin-top: 20rpx;
+		text-align: end;
+	}
+	
+	.body .login-btn{
 		width: 100%;
-		margin-top: 29rpx;
+		background: linear-gradient(to left, #ef315b, #ef315b,#ef315b, #f27c72);
+		height: 70rpx;
+		line-height: 70rpx;
+		font-size: 32rpx;
+		text-align: center;
+		border-radius: 30rpx;
+		margin-top: 150rpx;
+		color: #FFFFFF;
+		letter-spacing: 10rpx;
 	}
-
-	.tui-protocol-red {
-		color: #f54f46;
+	
+	.page .buttom-tip{
+		color: #a9a9a9;
+		font-size: 18rpx;
+		display: flex;
+		flex-direction: row;
+		position: fixed;
+		bottom: 120rpx;
+		left: 50%;
+		transform: translate(-50%, 0);
+		
+	}
+	
+	.buttom-tip .text{
+		margin-right: 10rpx;
+	}
+	
+	.buttom-tip .tip-high{
+		color: #ef315b;
+		border: none;
+		margin: 0;
+		padding: 0;
+		font-size: 18rpx;
 	}
 </style>

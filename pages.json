@@ -183,9 +183,13 @@
 	    ,{
             "path" : "pages/login/login",
 			"style": {
-				"navigationBarTitleText": "登录",
-				"navigationBarBackgroundColor": "#fff",
-				"navigationBarTextStyle": "black"
+				"navigationStyle": "custom"
+			}
+        }
+        ,{
+            "path" : "pages/register/register",
+            "style" : {
+				"navigationStyle": "custom"
 			}
         }
     ],
