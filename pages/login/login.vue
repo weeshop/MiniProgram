@@ -23,6 +23,8 @@
 				</view>
 			</view>
 		</form>
+		<button @tap="wechat_login_pc">PC微信登录</button>
+		<button @tap="wechat_login_mp">公众号微信登录</button>
 	</view>
 </template>
 
@@ -95,6 +97,16 @@
 					this.doLoop(60)
 				}, 500)
 			},
+			wechat_login_pc() {
+				const rurl = 'http://www.drupalcode.cn/oauth/wechat-authorize?app_id=wxb87abb0175b2c5a4&response_type=token&client_id=b46a8989-d545-4c34-9c92-7e8237891452&redirect_uri=http%3A//localhost%3A8080/&scope=&state=';
+			  console.log(rurl);
+				location.href = rurl;
+			},
+			wechat_login_mp() {
+				const rurl = 'http://ya.56gou.com/oauth/wechat-authorize?app_id=wx7da03a1e72bb4054&response_type=token&client_id=b46a8989-d545-4c34-9c92-7e8237891452&redirect_uri=http%3A//localhost%3A8080/&scope=&state=';
+			  console.log(rurl);
+				location.href = rurl;
+			},
 			promiseLogin(e) {
 				console.log(this.loginPromiseResolve)
 				// 用户名、邮箱或手机号 + 密码登录
@@ -108,7 +120,7 @@
 				const code = '666666'
 				let smsLogin = new Oauth2.CreateTokenBySMS(country, number, code)
 				
-				this.loginPromiseResolve(smsLogin) // 使用手机短信验证码登录
+				this.loginPromiseResolve(passwordLogin) // 使用手机短信验证码登录
 				uni.navigateBack()
 			},
 			formLogin: function(e) {
